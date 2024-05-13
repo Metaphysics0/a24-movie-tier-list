@@ -1,38 +1,18 @@
-# create-svelte
+# A24 Movies!
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+A up to date of all movies produced by A24, with nice sorting and ranking
 
-## Creating a project
+## Tech
 
-If you're seeing this, you've probably already done this step. Congrats!
+Basically i have a daily CRON job (hosted on val.town) that fetches the page data from a24 films webpage,
+(in order to not spam requests to them everytime a user uses this app), and stores it on S3.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+I fetch the page from s3, and use `xmldom` to parse the contents and grab the titles, then I use the tmbd api to get all the data for each movies
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Stack
+- SvelteKit
+- TMDB API
+- Val.town (CRON job)
+- S3
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Maybe i should move the xml dom parsing to the CRON as well

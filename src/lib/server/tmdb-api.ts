@@ -24,10 +24,9 @@ export class TmdbApi {
 		const response = await fetch(url, options);
 		const data = await response.json();
 		const searchResult = data?.results?.[0];
-		console.log('SEACH RESULT', searchResult);
 
 		if (!searchResult) {
-			console.log('unable to find searchResult');
+			console.warn('unable to find searchResult');
 			return;
 		}
 
