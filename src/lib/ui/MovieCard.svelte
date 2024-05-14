@@ -6,7 +6,7 @@
 	export let index: number;
 </script>
 
-<div class="mx-auto mb-2 flex w-max flex-col items-center">
+<div class="mx-auto mb-2 flex w-max max-w-64 flex-col items-center">
 	<div
 		class="card relative rounded-md transition-all ease-in hover:cursor-pointer hover:opacity-50"
 	>
@@ -19,7 +19,7 @@
 	</div>
 	<div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div>
 
-	<p class="text-xl font-bold">
+	<p class="text-center text-xl font-bold">
 		{movie.title}
 	</p>
 	{#if movie.release_date}
