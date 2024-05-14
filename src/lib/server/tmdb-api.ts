@@ -60,10 +60,15 @@ export class TmdbApi {
 		if (titleParts.length === 1) return { title: movieTitle };
 
 		const year = titleParts.at(-1);
-		return {
-			title: titleParts.slice(0, -1).join(' '),
-			year
-		};
+		const isValidYear = !isNaN(Number(year));
+		if (isValidYear) {
+			return {
+				title: titleParts.slice(0, -1).join(' '),
+				year
+			};
+		}
+
+		return { title: movieTitle };
 	}
 
 	get imagePrefix() {
