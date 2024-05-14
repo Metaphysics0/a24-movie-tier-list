@@ -14,6 +14,7 @@
 			src={movie.poster_path || movie.backdrop_path}
 			alt={`${movie.title} poster`}
 			class="max-w-64 rounded-md"
+			loading="lazy"
 		/>
 	</div>
 	<div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div>

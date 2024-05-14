@@ -14,4 +14,5 @@ export interface TmdbSearchResult {
 	vote_average: number;
 	vote_count: number;
 	score: number;
+	isUpcoming: boolean;
 }

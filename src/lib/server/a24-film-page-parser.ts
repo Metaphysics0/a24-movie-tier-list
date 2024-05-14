@@ -5,34 +5,63 @@ export class A24FilmPageParser {
 	async getMovieTitles() {
 		const pageData = await this.fetchPageData();
 		const doc = new DOMParser().parseFromString(pageData, 'text/html');
-		return [...this.getFeaturedMovies(doc), ...this.getMoviesFromList(doc)];
+		return [...this.getFeaturedMovieTitles(doc), ...this.getMovieTitlesFromList(doc)];
 	}
 
 	private async fetchPageData() {
 		const pageResponse = await new S3Respository().get('assets/a24-films.html');
-		return pageResponse?.Body.transformToString();
+		if (!pageResponse?.Body) {
+			throw new Error('Error getting page data from S3');
+		}
+		return pageResponse.Body.transformToString();
 	}
 
-	private getMoviesFromList(doc: Document) {
-		const titleElements = doc.getElementsByClassName('title');
-		const movieTitles = Array.from(titleElements)
-			.map((titleElement) => titleElement.textContent?.trim() || '')
-			.map(this.formatMovieTitle)
-			.filter((titleText) => !['Upcoming', 'All Films'].includes(titleText));
+	private getMovieTitlesFromList(doc: Document) {
+		try {
+			const titleElements = doc.getElementsByClassName('title');
+			const movieTitles = Array.from(titleElements)
+				.map((titleElement) => titleElement.textContent?.trim() || '')
+				.map(this.formatMovieTitle)
+				.filter((titleText) => !['Upcoming', 'All Films'].includes(titleText));
 
-		return movieTitles;
+			return movieTitles;
+		} catch (error) {
+			console.error('error getting movies from list', error);
+			return [];
+		}
 	}
 
-	private getFeaturedMovies(doc: Document) {
-		const featuredMovieTitleElements = doc.getElementsByClassName('media-tile');
-		const featuredMovieTitles = Array.from(featuredMovieTitleElements)
-			.map((ele) => {
-				const titleElement = ele.getElementsByTagName('a')?.[0];
-				return titleElement?.getAttribute('title');
-			})
-			.filter(Boolean);
+	private getFeaturedMovieTitles(doc: Document) {
+		try {
+			const featuredMovieTitleElements = doc.getElementsByClassName('media-tile');
+			const featuredMovieTitles = Array.from(featuredMovieTitleElements)
+				.map((ele) => {
+					const titleElement = ele.getElementsByTagName('a')?.[0];
+					return titleElement?.getAttribute('title');
+				})
+				.filter(Boolean);
 
-		return featuredMovieTitles;
+			return featuredMovieTitles;
+		} catch (error) {
+			console.error('error getting featured movies', error);
+			return [];
+		}
+	}
+
+	// not currently used, since the getMovieTitles response already includes it
+	private getComingSoonMovieTitles(doc: Document) {
+		try {
+			const comingSoonMovieElements = doc.getElementsByClassName(
+				'media-tile film active has-thumb'
+			);
+			return Array.from(comingSoonMovieElements).map((comingSoonMovieElement) => {
+				const href = comingSoonMovieElement.getElementsByTagName('a')[0];
+				return href.getAttribute('title');
+			});
+		} catch (error) {
+			console.error('erro getting coming soon movies', error);
+			return [];
+		}
 	}
 
 	private formatMovieTitle(movieTitle: string) {

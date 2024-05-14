@@ -34,6 +34,7 @@ export class TmdbApi {
 
 		this.addImageUrlPrefixesToSearchResult(searchResult);
 		this.addScoreToSearchResult(searchResult);
+		this.addIsUpcomingToSearchResult(searchResult);
 		return searchResult;
 	}
 
@@ -80,6 +81,11 @@ export class TmdbApi {
 
 	private addScoreToSearchResult(searchResult: TmdbSearchResult) {
 		searchResult.score = getScore(searchResult);
+	}
+
+	private addIsUpcomingToSearchResult(searchResult: TmdbSearchResult) {
+		const isUpcoming = new Date(searchResult.release_date) > new Date();
+		searchResult.isUpcoming = isUpcoming;
 	}
 
 	// for when we have a title that looks like 'Woostock 2023'

@@ -4,16 +4,22 @@ import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
+	const { movies, upcomingMovies } = await getMovies();
+
 	return {
-		movies: await getMovies()
+		movies,
+		upcomingMovies
 	};
 };
 
 async function getMovies() {
 	const movieTitles = await new A24FilmPageParser().getMovieTitles();
-	const movieResponses = await Promise.all(
-		movieTitles.map((movieTitle) => new TmdbApi().searchMovie(movieTitle!))
-	);
+	const movieResponses = (
+		await Promise.all(movieTitles.map((movieTitle) => new TmdbApi().searchMovie(movieTitle!)))
+	).filter(Boolean);
 
-	return movieResponses.filter(Boolean) as TmdbSearchResult[];
+	return {
+		movies: movieResponses.filter((movie) => !movie!.isUpcoming) as TmdbSearchResult[],
+		upcomingMovies: movieResponses.filter((movie) => movie!.isUpcoming) as TmdbSearchResult[]
+	};
 }
