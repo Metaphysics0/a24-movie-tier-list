@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
+import { getScore } from './score-calculator';
 
 export class TmdbApi {
 	async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
@@ -26,15 +27,16 @@ export class TmdbApi {
 		const searchResult = data?.results?.[0];
 
 		if (!searchResult) {
-			console.warn('unable to find searchResult');
+			console.warn(`unable to find searchResult for ${movieTitle}`);
 			return;
 		}
 
-		this.addImageUrlPrefixToSearchResult(searchResult);
+		this.addImageUrlPrefixesToSearchResult(searchResult);
+		this.addScoreToSearchResult(searchResult);
 		return searchResult;
 	}
 
-	private addImageUrlPrefixToSearchResult(searchResult: TmdbSearchResult) {
+	private addImageUrlPrefixesToSearchResult(searchResult: TmdbSearchResult) {
 		if (searchResult.backdrop_path) {
 			searchResult.backdrop_path = this.imagePrefix + searchResult.backdrop_path;
 		}
@@ -43,6 +45,10 @@ export class TmdbApi {
 			searchResult.poster_path = this.imagePrefix + searchResult.poster_path;
 		}
 		return searchResult;
+	}
+
+	private addScoreToSearchResult(searchResult: TmdbSearchResult) {
+		searchResult.score = getScore(searchResult);
 	}
 
 	// for when we have a title that looks like 'Woostock 2023'

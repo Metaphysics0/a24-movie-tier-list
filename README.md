@@ -15,4 +15,4 @@ I fetch the page from s3, and use `xmldom` to parse the contents and grab the ti
 - Val.town (CRON job)
 - S3
 
-Maybe i should move the xml dom parsing to the CRON as well
+Maybe i should move the xml dom parsing to the CRON as well 
