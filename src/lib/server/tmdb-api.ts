@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
+import { getScore } from './score-calculator';
 
 export class TmdbApi {
 	async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
@@ -23,26 +24,62 @@ export class TmdbApi {
 
 		const response = await fetch(url, options);
 		const data = await response.json();
-		const searchResult = data?.results?.[0];
+		const results = data.results as TmdbSearchResult[];
+		const searchResult = this.getMostRelevantSearchResult(results);
 
 		if (!searchResult) {
-			console.warn('unable to find searchResult');
+			console.warn(`unable to find searchResult for ${movieTitle}`);
 			return;
 		}
 
-		this.addImageUrlPrefixToSearchResult(searchResult);
+		this.addImageUrlPrefixesToSearchResult(searchResult);
+		this.addScoreToSearchResult(searchResult);
 		return searchResult;
 	}
 
-	private addImageUrlPrefixToSearchResult(searchResult: TmdbSearchResult) {
+	private getMostRelevantSearchResult(results: TmdbSearchResult[]): TmdbSearchResult | undefined {
+		if (!results.length) return;
+
+		if (results.length > 1) {
+			const relevantResults = results.filter((movie) => {
+				const releaseYear = new Date(movie.release_date).getFullYear();
+				return releaseYear >= this.a24OldestMovieYear;
+			});
+
+			const sortedMovies = relevantResults.sort((movieA, movieB) => {
+				// Check if release years match
+				const releaseYearA = new Date(movieA.release_date).getFullYear();
+				const releaseYearB = new Date(movieB.release_date).getFullYear();
+
+				// Sort by year (newer first)
+				if (releaseYearA !== releaseYearB) return releaseYearB - releaseYearA;
+
+				// If release dates are equal, sort by popularity (highest first)
+				if (movieA.popularity > movieB.popularity) return -1;
+				else if (movieA.popularity < movieB.popularity) return 1;
+
+				// If release dates and popularity are equal, sort by presence of poster path (with poster first)
+				return movieA.poster_path ? -1 : 1;
+			});
+			return sortedMovies[0];
+		}
+
+		return results[0];
+	}
+
+	private addImageUrlPrefixesToSearchResult(searchResult: TmdbSearchResult) {
 		if (searchResult.backdrop_path) {
-			searchResult.backdrop_path = this.imagePrefix + searchResult.backdrop_path;
+			searchResult.backdrop_path = this.tmdbImageUrlPrefix + searchResult.backdrop_path;
 		}
 
 		if (searchResult.poster_path) {
-			searchResult.poster_path = this.imagePrefix + searchResult.poster_path;
+			searchResult.poster_path = this.tmdbImageUrlPrefix + searchResult.poster_path;
 		}
 		return searchResult;
+	}
+
+	private addScoreToSearchResult(searchResult: TmdbSearchResult) {
+		searchResult.score = getScore(searchResult);
 	}
 
 	// for when we have a title that looks like 'Woostock 2023'
@@ -54,13 +91,17 @@ export class TmdbApi {
 		if (titleParts.length === 1) return { title: movieTitle };
 
 		const year = titleParts.at(-1);
-		return {
-			title: titleParts.slice(0, -1).join(' '),
-			year
-		};
+		const isValidYear = !isNaN(Number(year));
+		if (isValidYear) {
+			return {
+				title: titleParts.slice(0, -1).join(' '),
+				year
+			};
+		}
+
+		return { title: movieTitle };
 	}
 
-	get imagePrefix() {
-		return 'https://image.tmdb.org/t/p/original';
-	}
+	private readonly tmdbImageUrlPrefix = 'https://image.tmdb.org/t/p/original';
+	private readonly a24OldestMovieYear = 2013;
 }
