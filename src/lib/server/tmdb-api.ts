@@ -3,26 +3,27 @@ import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 import { getScore } from './score-calculator';
 
 export class TmdbApi {
-	async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
+	async search(movieTitle: string) {
+		try {
+			return this.searchMovie(movieTitle);
+		} catch (error) {
+			console.error(`Error getting search results for: ${movieTitle}`, error);
+		}
+	}
+
+	private async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
 		const { title, year } = this.getDeconstructedMovieTitle(movieTitle);
 
 		let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
 			title
 		)}&include_adult=false&language=en-US&page=1`;
 
-		if (year) {
-			url += `&year=${year}`;
-		}
+		if (year) url += `&year=${year}`;
 
-		const options = {
+		const response = await fetch(url, {
 			method: 'GET',
-			headers: {
-				accept: 'application/json',
-				Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`
-			}
-		};
-
-		const response = await fetch(url, options);
+			headers: this.requestHeaders
+		});
 		const data = await response.json();
 		const results = data.results as TmdbSearchResult[];
 		const searchResult = this.getMostRelevantSearchResult(results);
@@ -106,6 +107,13 @@ export class TmdbApi {
 		}
 
 		return { title: movieTitle };
+	}
+
+	private get requestHeaders() {
+		return {
+			accept: 'application/json',
+			Authorization: `Bearer ${env.TMDB_READ_ACCESS_TOKEN}`
+		};
 	}
 
 	private readonly tmdbImageUrlPrefix = 'https://image.tmdb.org/t/p/original';

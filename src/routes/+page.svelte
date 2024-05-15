@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { listFilterOptions } from '$lib/constants/listFilterOptions.js';
 	import Header from '$lib/ui/Header.svelte';
 	import MovieCard from '$lib/ui/MovieCard.svelte';
-	import Select from '$lib/ui/form/Select.svelte';
 
 	export let data;
 </script>
