@@ -14,10 +14,20 @@ export const load: PageServerLoad = async () => {
 
 async function getMovies() {
 	const movieTitles = await new A24FilmPageParser().getMovieTitles();
+	const tmdbApi = new TmdbApi();
+
+	const genreMapping = await tmdbApi.getGenreMappings();
 	const movieResponses = await Promise.all(
-		movieTitles.map((movieTitle) => new TmdbApi().search(movieTitle!))
+		movieTitles.map((movieTitle) => tmdbApi.search(movieTitle!))
 	);
 	const filteredMovies = movieResponses.filter(Boolean) as TmdbSearchResult[];
+
+	filteredMovies.forEach((movie) => {
+		movie.genres = movie.genre_ids.map(
+			(genreId) =>
+				genreMapping.find((mapping) => mapping.id === genreId)?.name?.toLocaleLowerCase()!
+		);
+	});
 
 	return {
 		movies: filteredMovies.filter((movie) => !movie.isUpcoming),

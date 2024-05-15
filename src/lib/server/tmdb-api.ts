@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import type { TmdbSearchResult } from '$lib/types/tmbd.types';
+import type { TmdbGenreMappingItem, TmdbSearchResult } from '$lib/types/tmbd.types';
 import { getScore } from './score-calculator';
 
 export class TmdbApi {
@@ -20,10 +20,7 @@ export class TmdbApi {
 
 		if (year) url += `&year=${year}`;
 
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: this.requestHeaders
-		});
+		const response = await fetch(url, { headers: this.requestHeaders });
 		const data = await response.json();
 		const results = data.results as TmdbSearchResult[];
 		const searchResult = this.getMostRelevantSearchResult(results);
@@ -37,6 +34,18 @@ export class TmdbApi {
 		this.addScoreToSearchResult(searchResult);
 		this.addIsUpcomingToSearchResult(searchResult);
 		return searchResult;
+	}
+
+	async getGenreMappings(): Promise<TmdbGenreMappingItem[]> {
+		try {
+			const url = 'https://api.themoviedb.org/3/genre/movie/list';
+			const response = await fetch(url, { headers: this.requestHeaders });
+			const data = await response.json();
+			return data.genres;
+		} catch (error) {
+			console.error('error getting genre mappings', error);
+			return [];
+		}
 	}
 
 	private getMostRelevantSearchResult(results: TmdbSearchResult[]): TmdbSearchResult | undefined {

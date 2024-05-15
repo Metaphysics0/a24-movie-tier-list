@@ -2,6 +2,7 @@ export interface TmdbSearchResult {
 	adult: boolean;
 	backdrop_path: string;
 	genre_ids: number[];
+	genres: string[];
 	id: number;
 	original_language: string;
 	original_title: string;
@@ -15,4 +16,9 @@ export interface TmdbSearchResult {
 	vote_count: number;
 	score: number;
 	isUpcoming: boolean;
+}
+
+export interface TmdbGenreMappingItem {
+	id: number;
+	name: string;
 }
