@@ -2,10 +2,12 @@ import { DOMParser } from 'xmldom';
 import { S3Respository } from './repositories/s3.repository';
 
 export class A24FilmPageParser {
-	async getMovieTitles() {
+	async getMovieTitles(): Promise<string[]> {
 		const pageData = await this.fetchPageData();
 		const doc = new DOMParser().parseFromString(pageData, 'text/html');
-		return [...this.getFeaturedMovieTitles(doc), ...this.getMovieTitlesFromList(doc)];
+		return [...this.getFeaturedMovieTitles(doc), ...this.getMovieTitlesFromList(doc)].filter(
+			Boolean
+		) as string[];
 	}
 
 	private async fetchPageData() {

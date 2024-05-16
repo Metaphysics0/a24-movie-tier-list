@@ -1,20 +1,53 @@
 import { env } from '$env/dynamic/private';
-import type { TmdbGenreMappingItem, TmdbSearchResult } from '$lib/types/tmbd.types';
-import { getScore } from './score-calculator';
+import type {
+	ExternalMovieIdsResponse,
+	TmdbGenreMappingItem,
+	TmdbSearchResult
+} from '$lib/types/tmbd.types';
+import { getScore } from '../score-calculator';
+import { TmdbApiEndpointPaths } from './api-endpoints.enum';
 
 export class TmdbApi {
-	async search(movieTitle: string) {
+	async searchMovies(movieTitles: string[]): Promise<TmdbSearchResult[]> {
 		try {
-			return this.searchMovie(movieTitle);
+			const tmdbGenres = await this.getGenres();
+			const movieResponses = await Promise.all(
+				movieTitles.map((movieTitle) => this.search(movieTitle!))
+			);
+			const filteredMovies = movieResponses.filter(Boolean) as TmdbSearchResult[];
+
+			filteredMovies.forEach((movie) => {
+				movie.genres = movie.genre_ids.map(
+					(genreId) =>
+						tmdbGenres.find((tmdbGenres) => tmdbGenres.id === genreId)?.name?.toLocaleLowerCase()!
+				);
+			});
+			return filteredMovies;
+		} catch (error) {
+			console.error('error searching movies', error);
+			return [];
+		}
+	}
+
+	async search(movieTitle: string): Promise<TmdbSearchResult | undefined> {
+		try {
+			const movieResponse = await this.searchMovie(movieTitle);
+			const externalMovieIds = await this.getExternalMovieIds(movieResponse!.id);
+
+			return {
+				...movieResponse!,
+				imdbLink: this.getImdbLinkfromId(externalMovieIds.imdb_id!)
+			};
 		} catch (error) {
 			console.error(`Error getting search results for: ${movieTitle}`, error);
+			return;
 		}
 	}
 
 	private async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
 		const { title, year } = this.getDeconstructedMovieTitle(movieTitle);
 
-		let url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(
+		let url = `${TmdbApiEndpointPaths.SEARCH_MOVIE}?query=${encodeURIComponent(
 			title
 		)}&include_adult=false&language=en-US&page=1`;
 
@@ -36,16 +69,29 @@ export class TmdbApi {
 		return searchResult;
 	}
 
-	async getGenreMappings(): Promise<TmdbGenreMappingItem[]> {
+	async getGenres(): Promise<TmdbGenreMappingItem[]> {
 		try {
-			const url = 'https://api.themoviedb.org/3/genre/movie/list';
-			const response = await fetch(url, { headers: this.requestHeaders });
+			const response = await fetch(TmdbApiEndpointPaths.GET_GENRES, {
+				headers: this.requestHeaders
+			});
 			const data = await response.json();
 			return data.genres;
 		} catch (error) {
 			console.error('error getting genre mappings', error);
 			return [];
 		}
+	}
+
+	// like imdb id
+	async getExternalMovieIds(movieId: string | number): Promise<ExternalMovieIdsResponse> {
+		const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/external_ids`, {
+			headers: this.requestHeaders
+		});
+		return response.json();
+	}
+
+	private getImdbLinkfromId(id: string): string {
+		return `https://www.imdb.com/title/${id}`;
 	}
 
 	private getMostRelevantSearchResult(results: TmdbSearchResult[]): TmdbSearchResult | undefined {

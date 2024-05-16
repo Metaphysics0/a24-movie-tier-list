@@ -4,11 +4,18 @@
 
 	export let movie: TmdbSearchResult;
 	export let index: number;
+
+	function redirectToImdb() {
+		window.open(movie.imdbLink, '_blank');
+	}
 </script>
 
 <div class="mx-auto mb-2 flex w-max max-w-64 flex-col items-center">
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		class="card relative rounded-md transition-all ease-in hover:cursor-pointer hover:opacity-50"
+		on:click={redirectToImdb}
 	>
 		<img
 			src={movie.poster_path || movie.backdrop_path}
