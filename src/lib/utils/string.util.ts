@@ -7,6 +7,10 @@ export function humanize(input: string) {
 		});
 }
 
+export function normalizeMovieTitleForUrl(movieTitle: string): string {
+	return movieTitle.toLocaleLowerCase().split(' ').join('-');
+}
+
 // function titleCase(input: string) {
 //   return input
 // }

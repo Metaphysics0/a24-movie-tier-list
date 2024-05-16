@@ -9,7 +9,7 @@ export function getSortedMovies(sortValue: string, movies: TmdbSearchResult[]): 
 
 	switch (sortValue) {
 		case SortOptions.TOP_RATED:
-			return movies.sort((a, b) => b.score - a.score);
+			return sortMovieOptions.byScore(movies);
 
 		case SortOptions.DATE_RELEASED_NEW_TO_OLD:
 			return movies.sort(
@@ -25,3 +25,9 @@ export function getSortedMovies(sortValue: string, movies: TmdbSearchResult[]): 
 			return movies;
 	}
 }
+
+export const sortMovieOptions = {
+	byScore(movies: TmdbSearchResult[]) {
+		return movies.sort((a, b) => b.score - a.score);
+	}
+};

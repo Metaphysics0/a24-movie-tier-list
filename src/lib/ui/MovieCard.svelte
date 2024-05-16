@@ -1,12 +1,16 @@
 <script lang="ts">
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getYear } from '$lib/utils/date.utils';
+	import { normalizeMovieTitleForUrl } from '$lib/utils/string.util';
 
 	export let movie: TmdbSearchResult;
 	export let index: number;
 
 	function redirectToImdb() {
-		window.open(movie.imdbLink, '_blank');
+		window.open(
+			window.location.href +
+				`movie/tmdb-movie-${movie.id}-${normalizeMovieTitleForUrl(movie.title)}`
+		);
 	}
 </script>
 

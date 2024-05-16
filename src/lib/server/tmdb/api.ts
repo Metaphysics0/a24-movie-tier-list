@@ -4,6 +4,7 @@ import type {
 	TmdbGenreMappingItem,
 	TmdbSearchResult
 } from '$lib/types/tmbd.types';
+import { sortMovieOptions } from '$lib/utils/listing/sort.util';
 import { getScore } from '../score-calculator';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
 
@@ -14,15 +15,19 @@ export class TmdbApi {
 			const movieResponses = await Promise.all(
 				movieTitles.map((movieTitle) => this.search(movieTitle!))
 			);
+
+			// remove undefined results
 			const filteredMovies = movieResponses.filter(Boolean) as TmdbSearchResult[];
 
+			// add genres to all movies
 			filteredMovies.forEach((movie) => {
 				movie.genres = movie.genre_ids.map(
 					(genreId) =>
 						tmdbGenres.find((tmdbGenres) => tmdbGenres.id === genreId)?.name?.toLocaleLowerCase()!
 				);
 			});
-			return filteredMovies;
+
+			return sortMovieOptions.byScore(filteredMovies);
 		} catch (error) {
 			console.error('error searching movies', error);
 			return [];
