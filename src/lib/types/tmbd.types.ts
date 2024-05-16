@@ -16,7 +16,9 @@ export interface TmdbSearchResult {
 	vote_count: number;
 	score: number;
 	isUpcoming: boolean;
-	imdbLink?: string;
+	imdb_link?: string;
+	external_movie_ids?: ExternalMovieIdsResponse;
+	omdbData?: any;
 }
 
 export interface TmdbGenreMappingItem {

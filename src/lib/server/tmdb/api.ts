@@ -5,8 +5,8 @@ import type {
 	TmdbSearchResult
 } from '$lib/types/tmbd.types';
 import { sortMovieOptions } from '$lib/utils/listing/sort.util';
-import { getScore } from '../score-calculator';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
+import { getScore } from './utils';
 
 export class TmdbApi {
 	async searchMovies(movieTitles: string[]): Promise<TmdbSearchResult[]> {
@@ -41,7 +41,8 @@ export class TmdbApi {
 
 			return {
 				...movieResponse!,
-				imdbLink: this.getImdbLinkfromId(externalMovieIds.imdb_id!)
+				external_movie_ids: externalMovieIds,
+				imdb_link: this.getImdbLinkfromId(externalMovieIds.imdb_id!)
 			};
 		} catch (error) {
 			console.error(`Error getting search results for: ${movieTitle}`, error);

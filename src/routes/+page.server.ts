@@ -1,6 +1,6 @@
-import { A24FilmPageParser } from '$lib/server/a24-film-page-parser';
+import { OmdbApi } from '$lib/server/omdb/api';
+import { A24FilmPageParser } from '$lib/server/scraper/a24-films-page.scraper';
 import { TmdbApi } from '$lib/server/tmdb/api';
-import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -15,10 +15,24 @@ export const load: PageServerLoad = async () => {
 async function getMovies() {
 	const movieTitles = await new A24FilmPageParser().getMovieTitles();
 	const tmdbApi = new TmdbApi();
-	const movieResponses = await tmdbApi.searchMovies(movieTitles);
+	const omdbApi = new OmdbApi();
+	const tmdbMovieResponses = await tmdbApi.searchMovies(movieTitles);
+
+	// const omdbDataResponses = await Promise.all(
+	// 	tmdbMovieResponses.map((movieResp) => omdbApi.getOmdbDataFromTmdbMovie(movieResp))
+	// );
+
+	// omdbDataResponses.forEach(({ omdbData, tmdbId }) => {
+	// 	const tmdbMovieIndex = tmdbMovieResponses.findIndex((movie) => movie.id === tmdbId);
+	// 	if (tmdbMovieIndex === -1) return;
+	// 	tmdbMovieResponses.splice(tmdbMovieIndex, 1, {
+	// 		...tmdbMovieResponses[tmdbMovieIndex],
+	// 		omdbData
+	// 	});
+	// });
 
 	return {
-		movies: movieResponses.filter((movie) => !movie.isUpcoming),
-		upcomingMovies: movieResponses.filter((movie) => movie.isUpcoming)
+		movies: tmdbMovieResponses.filter((movie) => !movie.isUpcoming),
+		upcomingMovies: tmdbMovieResponses.filter((movie) => movie.isUpcoming)
 	};
 }

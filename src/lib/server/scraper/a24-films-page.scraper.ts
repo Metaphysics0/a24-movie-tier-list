@@ -1,5 +1,5 @@
 import { DOMParser } from 'xmldom';
-import { S3Respository } from './repositories/s3.repository';
+import { S3Respository } from '../repositories/s3.repository';
 
 export class A24FilmPageParser {
 	async getMovieTitles(): Promise<string[]> {
