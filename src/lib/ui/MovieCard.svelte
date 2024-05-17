@@ -1,13 +1,12 @@
 <script lang="ts">
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getYear } from '$lib/utils/date.utils';
-	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore } from '@skeletonlabs/skeleton';
 	import RatingRow from './MovieCard/RatingRow.svelte';
 	import { getMovieInfoModalSettings } from '$lib/utils/modals/movie-info-modal.util';
 
 	export let movie: TmdbSearchResult;
 
-	export let index: number;
 	const modalStore = getModalStore();
 
 	const modalSettings = getMovieInfoModalSettings(movie);
@@ -27,7 +26,7 @@
 			loading="lazy"
 		/>
 	</div>
-	<div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div>
+	<!-- <div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div> -->
 
 	{#if movie.omdbData?.imdbRating}
 		<RatingRow {movie} />

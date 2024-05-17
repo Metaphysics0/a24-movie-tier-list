@@ -8,8 +8,6 @@
 	const allMovies = data.movies;
 
 	let movies = data.movies;
-
-	console.log('FIRST MOVIE', movies[0]);
 </script>
 
 <Header />
@@ -19,7 +17,7 @@
 </div>
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-	{#each movies as movie, index}
-		<MovieCard {movie} index={index + 1} />
+	{#each movies as movie}
+		<MovieCard {movie} />
 	{/each}
 </div>

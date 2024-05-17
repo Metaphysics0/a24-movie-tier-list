@@ -4,7 +4,8 @@ import { humanize } from '$lib/utils/string.util';
 export enum FilterOptions {
 	HORROR = 'horror',
 	COMEDY = 'comedy',
-	DRAMA = 'drama'
+	DRAMA = 'drama',
+	THRILLER = 'thriller'
 }
 
 export const filterOptions: CheckboxOption[] = [

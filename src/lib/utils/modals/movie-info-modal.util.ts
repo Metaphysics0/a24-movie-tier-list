@@ -5,11 +5,11 @@ import { getYear } from '../date.utils';
 
 export function getMovieInfoModalSettings(movie: TmdbSearchResult): ModalSettings {
 	return {
-		type: 'alert',
+		type: 'component',
 		title: getModalTitle(movie),
 		body: movie.overview,
 		image: movie.backdrop_path,
-		component: { ref: MovieInfoModal }
+		component: { ref: MovieInfoModal, props: { movie } }
 	};
 }
 
