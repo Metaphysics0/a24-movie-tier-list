@@ -1,26 +1,24 @@
 <script lang="ts">
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getYear } from '$lib/utils/date.utils';
-	import { normalizeMovieTitleForUrl } from '$lib/utils/string.util';
+	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import RatingRow from './MovieCard/RatingRow.svelte';
+	import { getMovieInfoModalSettings } from '$lib/utils/modals/movie-info-modal.util';
 
 	export let movie: TmdbSearchResult;
-	export let index: number;
 
-	function redirectToImdb() {
-		window.open(
-			window.location.href +
-				`movie/tmdb-movie-${movie.id}-${normalizeMovieTitleForUrl(movie.title)}`
-		);
-	}
+	export let index: number;
+	const modalStore = getModalStore();
+
+	const modalSettings = getMovieInfoModalSettings(movie);
 </script>
 
 <div class="mx-auto mb-2 flex w-max max-w-64 flex-col items-center">
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class="card relative rounded-md transition-all ease-in hover:cursor-pointer hover:opacity-50"
-		on:click={redirectToImdb}
+		class="card relative rounded-md shadow-sm transition-all ease-in hover:cursor-pointer hover:opacity-90 hover:shadow-md active:shadow-sm"
+		on:click={() => modalStore.trigger(modalSettings)}
 	>
 		<img
 			src={movie.poster_path || movie.backdrop_path}
