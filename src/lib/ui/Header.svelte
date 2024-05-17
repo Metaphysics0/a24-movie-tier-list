@@ -2,7 +2,7 @@
 	import a24Logo from '$lib/assets/a24-logo.svg';
 </script>
 
-<header class="mx-auto mb-16 mt-8 flex w-fit items-end">
-	<img src={a24Logo} alt="a24-logo" class="mr-2 max-w-36" />
-	<!-- <span class="text-2xl font-bold"></span> -->
+<header class="mx-auto mb-10 mt-8 flex w-fit flex-col items-center">
+	<img src={a24Logo} alt="a24-logo" class="mb-4 mr-2 max-w-36" />
+	<p class="text-lg font-semibold">The place for everything a24 movie related</p>
 </header>

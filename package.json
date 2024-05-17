@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "set -a && source .env && set +a && vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -12,6 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@iconify/svelte": "^4.0.2",
 		"@skeletonlabs/skeleton": "^2.10.0",
 		"@skeletonlabs/tw-plugin": "^0.4.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -35,6 +36,9 @@
 	"type": "module",
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.575.0",
+		"@vercel/kv": "^1.0.1",
+		"svelte-headlessui": "^0.0.35",
+		"svelte-transition": "^0.0.16",
 		"xmldom": "^0.6.0"
 	}
 }
