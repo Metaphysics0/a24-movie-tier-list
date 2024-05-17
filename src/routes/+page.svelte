@@ -1,13 +1,15 @@
 <script lang="ts">
 	import Header from '$lib/ui/Header.svelte';
 	import MovieCard from '$lib/ui/MovieCard.svelte';
-	import ListFilters from '$lib/ui/form/ListFilters.svelte';
+	import ListFilters from '$lib/ui/ListFilters.svelte';
 
 	export let data;
 
 	const allMovies = data.movies;
 
 	let movies = data.movies;
+
+	console.log('FIRST MOVIE', movies[0]);
 </script>
 
 <Header />

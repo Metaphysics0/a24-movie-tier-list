@@ -1,3 +1,5 @@
+import type { OmdbSearchResponse } from './omdb.types';
+
 export interface TmdbSearchResult {
 	adult: boolean;
 	backdrop_path: string;
@@ -18,7 +20,7 @@ export interface TmdbSearchResult {
 	isUpcoming: boolean;
 	imdb_link?: string;
 	external_movie_ids?: ExternalMovieIdsResponse;
-	omdbData?: any;
+	omdbData?: OmdbSearchResponse;
 }
 
 export interface TmdbGenreMappingItem {

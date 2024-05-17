@@ -2,6 +2,7 @@
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getYear } from '$lib/utils/date.utils';
 	import { normalizeMovieTitleForUrl } from '$lib/utils/string.util';
+	import RatingRow from './MovieCard/RatingRow.svelte';
 
 	export let movie: TmdbSearchResult;
 	export let index: number;
@@ -30,10 +31,15 @@
 	</div>
 	<div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div>
 
-	<p class="text-center text-xl font-bold">
-		{movie.title}
-	</p>
-	{#if movie.release_date}
-		<p class="text-lg">({getYear(new Date(movie.release_date))})</p>
+	{#if movie.omdbData?.imdbRating}
+		<RatingRow {movie} />
 	{/if}
+	<p class="flex items-center text-center text-xl font-bold">
+		<span class="mr-2">
+			{movie.title}
+		</span>
+		{#if movie.release_date}
+			<span class="text-lg font-normal">({getYear(new Date(movie.release_date))})</span>
+		{/if}
+	</p>
 </div>

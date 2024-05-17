@@ -8,27 +8,36 @@ import { kv } from '@vercel/kv';
 // their free tier has a limit of 1000 free requests per day,
 // so we cache the results
 export class OmdbApi {
-	async searchById(id: string): Promise<OmdbSearchResponse | undefined> {
+	async searchByTmbdMovieResponses(tmdbMovies: TmdbSearchResult[]) {
 		try {
-			const cachedSearchResult = await this.getSearchByIdResultFromCache(id);
-			if (cachedSearchResult) {
-				console.log(`Cache HIT for imdb movie: ${id}`);
-				return cachedSearchResult;
-			}
+			const cachedResults = await this.getSearchByTmdbMovieResponsesResultFromCache(
+				tmdbMovies.map((a) => a.id)
+			);
+			if (cachedResults) return cachedResults;
 
-			const response = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=${OMDB_API_KEY}`);
-			const data = await response.json();
-			await this.setSearchByIdResultInCache(id, data);
-			return data;
+			const omdbDataResponses = await Promise.all(
+				tmdbMovies.map((movieResp) => this.getOmdbDataFromTmdbMovie(movieResp))
+			);
+			await this.setSearchByTmdbMovieResponsesResultInCache(omdbDataResponses);
+
+			return omdbDataResponses;
 		} catch (error) {
-			console.error(`OMDB search failed for imdb id: ${id}`);
+			console.error('searchByTmbdMovieResponses failed', error);
 		}
 	}
 
-	async getOmdbDataFromTmdbMovie(tmdbMovie: TmdbSearchResult): Promise<{
-		tmdbId: number;
-		omdbData: OmdbSearchResponse | undefined;
-	}> {
+	async searchById(id: string): Promise<OmdbSearchResponse | undefined> {
+		try {
+			const response = await fetch(`http://www.omdbapi.com/?i=${id}&apikey=${OMDB_API_KEY}`);
+			return response.json();
+		} catch (error) {
+			console.error(`OMDB search failed for imdb id: ${id}`, error);
+		}
+	}
+
+	async getOmdbDataFromTmdbMovie(
+		tmdbMovie: TmdbSearchResult
+	): Promise<GetOmdbDataFromTmdbMovieResponse> {
 		const imdbId = tmdbMovie.external_movie_ids?.imdb_id;
 		if (!imdbId) {
 			console.warn(`OmdbApi - tmdb movie: ${tmdbMovie.title} does not have an imdb id`);
@@ -44,26 +53,43 @@ export class OmdbApi {
 		};
 	}
 
-	async getSearchByIdResultFromCache(id: string): Promise<OmdbSearchResponse | undefined | null> {
+	async getSearchByTmdbMovieResponsesResultFromCache(
+		tmdbMovieIds: number[]
+	): Promise<GetOmdbDataFromTmdbMovieResponse[] | undefined | null> {
 		try {
-			return kv.get<OmdbSearchResponse>(this.getCacheKeyForMovieSearch(id));
+			return kv.get<GetOmdbDataFromTmdbMovieResponse[]>(
+				this.getCacheKeyForTmdbMovies(tmdbMovieIds)
+			);
 		} catch (error) {
 			console.error('Error retrieving omdb search result from cache: ', error);
 		}
 	}
 
-	async setSearchByIdResultInCache(id: string, searchResult: OmdbSearchResponse): Promise<void> {
+	async setSearchByTmdbMovieResponsesResultInCache(
+		responses: GetOmdbDataFromTmdbMovieResponse[]
+	): Promise<void> {
 		try {
-			console.log(`caching omdb search result for imdb movie id: ${id}`);
-			await kv.set<OmdbSearchResponse>(this.getCacheKeyForMovieSearch(id), searchResult, {
-				ex: ONE_DAY_IN_SECONDS
-			});
+			console.log(`caching omdb search result for tmdb movies`);
+			await kv.set<GetOmdbDataFromTmdbMovieResponse[]>(
+				this.getCacheKeyForTmdbMovies(responses.map((a) => a.tmdbId)),
+				responses,
+				{
+					ex: ONE_DAY_IN_SECONDS
+				}
+			);
 		} catch (error) {
-			console.error(`Error caching omdb search result for imdb movie: ${id}`, error);
+			console.error(`Error caching omdb search result for tmdb movies`, error);
 		}
 	}
 
-	private getCacheKeyForMovieSearch(id: string): string {
-		return `omdb_search_result_for_${id}`;
+	private getCacheKeyForTmdbMovies(tmdbMovieIds: number[]): string {
+		// Sort the movie IDs for consistent key generation
+		const sortedIds = tmdbMovieIds.slice().sort();
+		return `omdb_search_results:${sortedIds.join(',')}`;
 	}
+}
+
+interface GetOmdbDataFromTmdbMovieResponse {
+	tmdbId: number;
+	omdbData: OmdbSearchResponse | undefined;
 }
