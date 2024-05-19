@@ -2,7 +2,7 @@ import { OMDB_API_KEY } from '$env/static/private';
 import { ONE_DAY_IN_SECONDS } from '$lib/constants/date.constants';
 import type { OmdbSearchResponse } from '$lib/types/omdb.types';
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
-import { kv } from '@vercel/kv';
+import { redis } from '../cache/redis';
 
 // mainly used for IMDB ratings.
 // their free tier has a limit of 1000 free requests per day,
@@ -13,7 +13,10 @@ export class OmdbApi {
 			const cachedResults = await this.getSearchByTmdbMovieResponsesResultFromCache(
 				tmdbMovies.map((a) => a.id)
 			);
-			if (cachedResults) return cachedResults;
+			if (cachedResults) {
+				console.log('Cache HIT for movie responses');
+				return cachedResults;
+			}
 
 			const omdbDataResponses = await Promise.all(
 				tmdbMovies.map((movieResp) => this.getOmdbDataFromTmdbMovie(movieResp))
@@ -59,7 +62,7 @@ export class OmdbApi {
 		tmdbMovieIds: number[]
 	): Promise<GetOmdbDataFromTmdbMovieResponse[] | undefined | null> {
 		try {
-			return kv.get<GetOmdbDataFromTmdbMovieResponse[]>(
+			return redis.get<GetOmdbDataFromTmdbMovieResponse[]>(
 				this.getCacheKeyForTmdbMovies(tmdbMovieIds)
 			);
 		} catch (error) {
@@ -72,11 +75,11 @@ export class OmdbApi {
 	): Promise<void> {
 		try {
 			console.log(`caching omdb search result for tmdb movies`);
-			await kv.set<GetOmdbDataFromTmdbMovieResponse[]>(
+			await redis.set<GetOmdbDataFromTmdbMovieResponse[]>(
 				this.getCacheKeyForTmdbMovies(responses.map((a) => a.tmdbId)),
 				responses,
 				{
-					ex: ONE_DAY_IN_SECONDS
+					ex: ONE_DAY_IN_SECONDS * 2
 				}
 			);
 		} catch (error) {

@@ -12,6 +12,8 @@
 	// @ts-ignore
 	const movie = $modalStore[0].component.props.movie as TmdbSearchResult;
 
+	console.log('movie', movie);
+
 	function getWatchNowUrl() {
 		const normalizedTitle = normalizeMovieTitleForUrl(movie.title);
 		return `https://sudo-flix.lol/media/tmdb-movie-${movie.external_movie_ids?.imdb_id}-${normalizedTitle}`;
