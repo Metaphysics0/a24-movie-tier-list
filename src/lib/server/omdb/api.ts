@@ -43,12 +43,14 @@ export class OmdbApi {
 			console.warn(`OmdbApi - tmdb movie: ${tmdbMovie.title} does not have an imdb id`);
 			return {
 				tmdbId: tmdbMovie.id,
+				tmdbData: tmdbMovie,
 				omdbData: undefined
 			};
 		}
 		const omdbData = await this.searchById(imdbId);
 		return {
 			tmdbId: tmdbMovie.id,
+			tmdbData: tmdbMovie,
 			omdbData
 		};
 	}
@@ -92,4 +94,5 @@ export class OmdbApi {
 interface GetOmdbDataFromTmdbMovieResponse {
 	tmdbId: number;
 	omdbData: OmdbSearchResponse | undefined;
+	tmdbData: TmdbSearchResult;
 }

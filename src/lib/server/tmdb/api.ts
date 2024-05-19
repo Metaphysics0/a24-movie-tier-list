@@ -4,7 +4,6 @@ import type {
 	TmdbGenreMappingItem,
 	TmdbSearchResult
 } from '$lib/types/tmbd.types';
-import { sortMovieOptions } from '$lib/utils/listing/sort.util';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
 import { getScore } from './utils';
 
@@ -26,8 +25,7 @@ export class TmdbApi {
 						tmdbGenres.find((tmdbGenres) => tmdbGenres.id === genreId)?.name?.toLocaleLowerCase()!
 				);
 			});
-
-			return sortMovieOptions.byScore(filteredMovies);
+			return filteredMovies;
 		} catch (error) {
 			console.error('error searching movies', error);
 			return [];
@@ -61,7 +59,7 @@ export class TmdbApi {
 
 		const response = await fetch(url, { headers: this.requestHeaders });
 		const data = await response.json();
-		const results = data.results as TmdbSearchResult[];
+		const results = data?.results as TmdbSearchResult[];
 		const searchResult = this.getMostRelevantSearchResult(results);
 
 		if (!searchResult) {
@@ -101,7 +99,7 @@ export class TmdbApi {
 	}
 
 	private getMostRelevantSearchResult(results: TmdbSearchResult[]): TmdbSearchResult | undefined {
-		if (!results.length) return;
+		if (!results?.length) return;
 
 		if (results.length > 1) {
 			const relevantResults = results.filter((movie) => {

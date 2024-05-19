@@ -7,8 +7,6 @@
 
 	export let parent: SvelteComponent;
 
-	console.log('parent', parent);
-
 	const modalStore = getModalStore();
 
 	// @ts-ignore

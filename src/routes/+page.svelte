@@ -12,7 +12,7 @@
 
 <Header />
 
-<div class="mb-11 ml-10 flex items-center">
+<div class="mb-11 ml-0 flex items-center md:ml-10 lg:ml-10">
 	<ListFilters bind:movies {allMovies} />
 </div>
 
