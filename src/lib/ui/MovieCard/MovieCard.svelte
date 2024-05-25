@@ -2,8 +2,9 @@
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getYear } from '$lib/utils/date.utils';
 	import { getModalStore } from '@skeletonlabs/skeleton';
-	import RatingRow from './MovieCard/RatingRow.svelte';
+	import RatingRow from './RatingRow.svelte';
 	import { getMovieInfoModalSettings } from '$lib/utils/modals/movie-info-modal.util';
+	import ActionIcons from './ActionIcons.svelte';
 
 	export let movie: TmdbSearchResult;
 
@@ -25,6 +26,7 @@
 			class="max-w-64 rounded-md"
 			loading="lazy"
 		/>
+		<ActionIcons {movie} />
 	</div>
 	<!-- <div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div> -->
 

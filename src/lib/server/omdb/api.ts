@@ -62,6 +62,7 @@ export class OmdbApi {
 		tmdbMovieIds: number[]
 	): Promise<GetOmdbDataFromTmdbMovieResponse[] | undefined | null> {
 		try {
+			// const keys = await redis.find
 			return redis.get<GetOmdbDataFromTmdbMovieResponse[]>(
 				this.getCacheKeyForTmdbMovies(tmdbMovieIds)
 			);

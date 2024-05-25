@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/ui/Header.svelte';
-	import MovieCard from '$lib/ui/MovieCard.svelte';
+	import MovieCard from '$lib/ui/MovieCard/MovieCard.svelte';
 	import ListFilters from '$lib/ui/ListFilters.svelte';
 
 	export let data;
