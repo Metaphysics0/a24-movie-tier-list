@@ -1,64 +1,101 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
-	import { setWatchlistItem, watchlistStore } from '$lib/stores/watchlist/store';
+	import {
+		isItemInWatchlist,
+		removeWatchlistItem,
+		setWatchlistItem,
+		watchlistStore
+	} from '$lib/stores/watchlist/store';
+	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
+	import type { ActionButton } from '$lib/types/action-buttons.types';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+
+	const toastStore = getToastStore();
 
 	export let movie: TmdbSearchResult;
+
+	let currentWatchlist: TmdbSearchResult[] = [];
+	watchlistStore.subscribe((movies) => {
+		currentWatchlist = movies;
+	});
 
 	function likeMovie(e: Event): void {
 		console.log('liked!');
 	}
 
-	function addMovieToWatchlist(e: Event): void {
+	function addOrRemoveItemFromWatchlist(e: Event, idx: number): void {
+		if (isItemInWatchlist(currentWatchlist, movie)) {
+			actions[idx].isActive = false;
+			removeWatchlistItem(movie);
+			toastStore.trigger({ message: 'Removed from watchlist' });
+			return;
+		}
+
+		actions[idx].isActive = true;
 		setWatchlistItem(movie);
+		toastStore.trigger({ message: 'Added to watchlist' });
 	}
 
-	watchlistStore.subscribe((movies) => {
-		console.log('movies', movies);
-	});
-
-	const actions = [
+	const actions: ActionButton[] = [
 		{
 			iconClass: 'mdi:heart-outline',
-			hoverIconClass: 'mdi:heart',
-			isHoverActive: false,
+			activeIconClass: 'mdi:heart',
+			activeIconColorClass: 'text-red-500',
+			isHovering: false,
+			isActive: false,
+			tooltipText: 'Add to favorites',
 			onClick: likeMovie
 		},
 		{
 			iconClass: 'material-symbols:bookmark-outline',
-			hoverIconClass: 'material-symbols:bookmark',
-			isHoverActive: false,
-			onClick: addMovieToWatchlist
+			activeIconClass: 'material-symbols:bookmark',
+			activeIconColorClass: 'text-amber-400',
+			isHovering: false,
+			isActive: isItemInWatchlist(currentWatchlist, movie),
+			tooltipText: 'Add to watchlist',
+			onClick: addOrRemoveItemFromWatchlist
 		}
 	];
 
-	const toggleHover = ({ idx, isHoverActive }: { idx: number; isHoverActive: boolean }) => {
+	const tooltipConfig: Omit<PopupSettings, 'target'> = {
+		event: 'hover',
+		placement: 'right'
+	};
+
+	const toggleHover = ({ idx, isHovering }: { idx: number; isHovering: boolean }) => {
 		actions[idx] = {
 			...actions[idx],
-			isHoverActive
+			isHovering
 		};
 	};
 </script>
 
 <div
-	class="absolute right-0 top-0 flex flex-col rounded-bl-md rounded-tr-md bg-white bg-opacity-90 p-1"
+	class="absolute right-0 top-0 z-50 flex flex-col rounded-bl-md rounded-tr-md bg-white bg-opacity-90 p-1"
 >
 	{#each actions as action, idx}
 		<button
 			on:click={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
-				action.onClick(e);
+				action.onClick(e, idx);
 			}}
 			tabindex="0"
-			on:mouseover={() => toggleHover({ idx, isHoverActive: true })}
-			on:focus={() => toggleHover({ idx, isHoverActive: true })}
-			on:mouseleave={() => toggleHover({ idx, isHoverActive: false })}
+			on:mouseover={() => toggleHover({ idx, isHovering: true })}
+			on:focus={() => toggleHover({ idx, isHovering: true })}
+			on:mouseleave={() => toggleHover({ idx, isHovering: action.isActive })}
+			use:popup={{ ...tooltipConfig, target: `tooltip-${idx}` }}
 		>
 			<Icon
-				class="text-3xl"
-				icon={action.isHoverActive ? action.hoverIconClass : action.iconClass}
+				class="text-3xl {action.isHovering || action.isActive ? action.activeIconColorClass : ''}"
+				icon={action.isHovering || action.isActive ? action.activeIconClass : action.iconClass}
 			/>
 		</button>
+
+		<div class="card variant-filled-secondary z-40 w-max p-4" data-popup="tooltip-{idx}">
+			<p>{action.tooltipText}</p>
+			<div class="variant-filled-secondary arrow" />
+		</div>
 	{/each}
 </div>

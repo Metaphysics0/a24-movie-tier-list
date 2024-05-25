@@ -1,18 +1,21 @@
 import { type TmdbSearchResult } from '$lib/types/tmbd.types';
 
 import { writable } from 'svelte/store';
-import { WATCHLIST_LOCALSTORAGE_KEY } from './constants';
+import { LocalStorageHelper } from './localStorageHelper';
 
-export const watchlistStore = writable<TmdbSearchResult[]>(getWatchlistFromLocalStorage());
+export const watchlistStore = writable<TmdbSearchResult[]>(LocalStorageHelper.getWatchlist());
 
 export function setWatchlistItem(watchlistItem: TmdbSearchResult): void {
 	try {
 		watchlistStore.update((currentWatchlistItems) => {
-			if (currentWatchlistItems.find((item) => item.id === watchlistItem.id)) {
+			if (isItemInWatchlist(currentWatchlistItems, watchlistItem)) {
 				console.warn(`Movie: ${watchlistItem.title} is already in watchlist!`);
 				return currentWatchlistItems;
 			}
-			return [...currentWatchlistItems, watchlistItem];
+
+			const watchlist = [...currentWatchlistItems, watchlistItem];
+			LocalStorageHelper.setWatchlist(watchlist);
+			return watchlist;
 		});
 	} catch (error) {
 		console.error('Error setting watchlist item', error);
@@ -22,25 +25,22 @@ export function setWatchlistItem(watchlistItem: TmdbSearchResult): void {
 export function removeWatchlistItem(watchlistItem: TmdbSearchResult): void {
 	try {
 		watchlistStore.update((currentWatchlistItems) => {
-			if (currentWatchlistItems.find((item) => item.id === watchlistItem.id)) {
-				console.warn(`Movie: ${watchlistItem.title} is already in watchlist!`);
+			if (!isItemInWatchlist(currentWatchlistItems, watchlistItem)) {
+				console.warn(`Movie: ${watchlistItem.title} is already removed!`);
 				return currentWatchlistItems;
 			}
-			return [...currentWatchlistItems, watchlistItem];
+			const watchlist = currentWatchlistItems.filter((item) => item.id !== watchlistItem.id);
+			LocalStorageHelper.setWatchlist(watchlist);
+			return watchlist;
 		});
 	} catch (error) {
 		console.error('Error setting watchlist item', error);
 	}
 }
 
-function getWatchlistFromLocalStorage(): TmdbSearchResult[] {
-	try {
-		const items = localStorage.getItem(WATCHLIST_LOCALSTORAGE_KEY);
-		if (!items) return [];
-
-		return JSON.parse(items);
-	} catch (error) {
-		console.warn('error getting watchlist from localstorage', error);
-		return [];
-	}
+export function isItemInWatchlist(
+	watchlist: TmdbSearchResult[],
+	watchlistItem: TmdbSearchResult
+): boolean {
+	return !!watchlist.find((movie) => movie.id === watchlistItem.id);
 }
