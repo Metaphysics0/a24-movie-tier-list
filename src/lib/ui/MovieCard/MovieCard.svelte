@@ -4,7 +4,7 @@
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import RatingRow from './RatingRow.svelte';
 	import { getMovieInfoModalSettings } from '$lib/utils/modals/movie-info-modal.util';
-	import ActionIcons from './ActionIcons.svelte';
+	import ActionIcons from './ActionButtons.svelte';
 
 	export let movie: TmdbSearchResult;
 
@@ -14,11 +14,12 @@
 </script>
 
 <div class="mx-auto mb-2 flex w-max max-w-64 flex-col items-center">
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div
+	<button
 		class="card relative rounded-md shadow-sm transition-all ease-in hover:cursor-pointer hover:opacity-90 hover:shadow-md active:shadow-sm"
-		on:click={() => modalStore.trigger(modalSettings)}
+		on:click={(e) => {
+			e.preventDefault();
+			modalStore.trigger(modalSettings);
+		}}
 	>
 		<img
 			src={movie.poster_path || movie.backdrop_path}
@@ -27,8 +28,7 @@
 			loading="lazy"
 		/>
 		<ActionIcons {movie} />
-	</div>
-	<!-- <div class="absolute bg-slate-500 bg-opacity-10 p-2 text-xl font-bold text-white">{index}</div> -->
+	</button>
 
 	{#if movie.omdbData?.imdbRating}
 		<RatingRow {movie} />

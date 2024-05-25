@@ -2,14 +2,19 @@
 	import Icon from '@iconify/svelte';
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import {
-		isItemInWatchlist,
 		removeWatchlistItem,
-		setWatchlistItem,
+		addWatchlistItem,
 		watchlistStore
 	} from '$lib/stores/watchlist/store';
 	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import type { ActionButton } from '$lib/types/action-buttons.types';
 	import { getToastStore } from '@skeletonlabs/skeleton';
+	import { isMovieInList } from '$lib/stores/helpers/listHelper';
+	import {
+		addLikedMovie,
+		likedMoviesStore,
+		removeLikedMovie
+	} from '$lib/stores/liked-movies/store';
 
 	const toastStore = getToastStore();
 
@@ -20,12 +25,26 @@
 		currentWatchlist = movies;
 	});
 
-	function likeMovie(e: Event): void {
-		console.log('liked!');
+	let currentLikedMovies: TmdbSearchResult[] = [];
+	likedMoviesStore.subscribe((movies) => {
+		currentLikedMovies = movies;
+	});
+
+	function addOrRemoveItemFromLikes(e: Event, idx: number): void {
+		if (isMovieInList(currentLikedMovies, movie)) {
+			actions[idx].isActive = false;
+			removeLikedMovie(movie);
+			toastStore.trigger({ message: 'Removed from favorites' });
+			return;
+		}
+
+		actions[idx].isActive = true;
+		addLikedMovie(movie);
+		toastStore.trigger({ message: 'Added to favorites' });
 	}
 
 	function addOrRemoveItemFromWatchlist(e: Event, idx: number): void {
-		if (isItemInWatchlist(currentWatchlist, movie)) {
+		if (isMovieInList(currentWatchlist, movie)) {
 			actions[idx].isActive = false;
 			removeWatchlistItem(movie);
 			toastStore.trigger({ message: 'Removed from watchlist' });
@@ -33,7 +52,7 @@
 		}
 
 		actions[idx].isActive = true;
-		setWatchlistItem(movie);
+		addWatchlistItem(movie);
 		toastStore.trigger({ message: 'Added to watchlist' });
 	}
 
@@ -45,14 +64,14 @@
 			isHovering: false,
 			isActive: false,
 			tooltipText: 'Add to favorites',
-			onClick: likeMovie
+			onClick: addOrRemoveItemFromLikes
 		},
 		{
 			iconClass: 'material-symbols:bookmark-outline',
 			activeIconClass: 'material-symbols:bookmark',
 			activeIconColorClass: 'text-amber-400',
 			isHovering: false,
-			isActive: isItemInWatchlist(currentWatchlist, movie),
+			isActive: isMovieInList(currentWatchlist, movie),
 			tooltipText: 'Add to watchlist',
 			onClick: addOrRemoveItemFromWatchlist
 		}

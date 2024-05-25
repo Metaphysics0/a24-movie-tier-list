@@ -1,46 +1,35 @@
 import { type TmdbSearchResult } from '$lib/types/tmbd.types';
 
 import { writable } from 'svelte/store';
-import { LocalStorageHelper } from './localStorageHelper';
+import { LocalStorageHelper, LocalStorageStores } from '../helpers/localStorageHelper';
+import * as ListHelper from '../helpers/listHelper';
 
 export const watchlistStore = writable<TmdbSearchResult[]>(LocalStorageHelper.getWatchlist());
 
-export function setWatchlistItem(watchlistItem: TmdbSearchResult): void {
+export function addWatchlistItem(movieToAdd: TmdbSearchResult): void {
 	try {
-		watchlistStore.update((currentWatchlistItems) => {
-			if (isItemInWatchlist(currentWatchlistItems, watchlistItem)) {
-				console.warn(`Movie: ${watchlistItem.title} is already in watchlist!`);
-				return currentWatchlistItems;
-			}
-
-			const watchlist = [...currentWatchlistItems, watchlistItem];
-			LocalStorageHelper.setWatchlist(watchlist);
-			return watchlist;
+		watchlistStore.update((currentMovies) => {
+			return ListHelper.addMovie({
+				movieToAdd,
+				currentMovies,
+				localStorageStore: LocalStorageStores.Watchlist
+			});
 		});
 	} catch (error) {
 		console.error('Error setting watchlist item', error);
 	}
 }
 
-export function removeWatchlistItem(watchlistItem: TmdbSearchResult): void {
+export function removeWatchlistItem(movieToRemove: TmdbSearchResult): void {
 	try {
-		watchlistStore.update((currentWatchlistItems) => {
-			if (!isItemInWatchlist(currentWatchlistItems, watchlistItem)) {
-				console.warn(`Movie: ${watchlistItem.title} is already removed!`);
-				return currentWatchlistItems;
-			}
-			const watchlist = currentWatchlistItems.filter((item) => item.id !== watchlistItem.id);
-			LocalStorageHelper.setWatchlist(watchlist);
-			return watchlist;
+		watchlistStore.update((currentMovies) => {
+			return ListHelper.removeMovie({
+				movieToRemove,
+				currentMovies,
+				localStorageStore: LocalStorageStores.Watchlist
+			});
 		});
 	} catch (error) {
 		console.error('Error setting watchlist item', error);
 	}
-}
-
-export function isItemInWatchlist(
-	watchlist: TmdbSearchResult[],
-	watchlistItem: TmdbSearchResult
-): boolean {
-	return !!watchlist.find((movie) => movie.id === watchlistItem.id);
 }
