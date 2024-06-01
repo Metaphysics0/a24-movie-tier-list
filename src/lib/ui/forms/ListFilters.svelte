@@ -4,8 +4,8 @@
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { getFilteredMovies } from '$lib/utils/listing/filter.util';
 	import { getSortedMovies } from '$lib/utils/listing/sort.util';
-	import Checkbox from './inputs/Checkbox.svelte';
-	import Select from './inputs/Select.svelte';
+	import Checkbox from './Checkbox.svelte';
+	import Select from './Select.svelte';
 
 	export let movies: TmdbSearchResult[];
 

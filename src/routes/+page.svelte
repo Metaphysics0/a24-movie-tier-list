@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Header from '$lib/ui/Header.svelte';
+	import Header from '$lib/ui/typography/Header.svelte';
 	import MovieCard from '$lib/ui/MovieCard/MovieCard.svelte';
-	import ListFilters from '$lib/ui/ListFilters.svelte';
+	import ListFilters from '$lib/ui/forms/ListFilters.svelte';
 
 	export let data;
 

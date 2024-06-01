@@ -20,7 +20,12 @@
 
 {#if $modalStore[0]}
 	<div class="modal-example-form card w-modal space-y-4 p-4 shadow-xl">
-		<header class="text-2xl font-bold">{$modalStore[0].title ?? '(title missing)'}</header>
+		<header class="text-2xl font-bold">
+			{$modalStore[0].title ?? '(title missing)'}
+			{#if movie.omdbData?.Rated}
+				<span class="ml-1 font-movieRating"> {movie.omdbData?.Rated} </span>
+			{/if}
+		</header>
 		<article>
 			<p class="text-xl font-semibold">Overview:</p>
 			{$modalStore[0].body ?? '(body missing)'}
@@ -40,7 +45,7 @@
 				href={movie.imdb_link}
 			>
 				<span><Icon icon="ic:baseline-local-movies" /></span>
-				<span>Imdb page</span>
+				<span>IMDB</span>
 			</a>
 			<a
 				class="btn h-min w-max bg-[#535397] font-bold text-white"
