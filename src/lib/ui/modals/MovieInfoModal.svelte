@@ -11,6 +11,7 @@
 
 	// @ts-ignore
 	const movie = $modalStore[0].component.props.movie as TmdbSearchResult;
+	console.log('MOVIEE', movie);
 
 	function getWatchNowUrl() {
 		const normalizedTitle = normalizeMovieTitleForUrl(movie.title);
@@ -38,12 +39,7 @@
 			/>
 		{/if}
 		<div class="flex flex-col">
-			<a
-				class="btn mb-2 h-min w-max bg-[#f4c519] font-bold"
-				on:click={() => console.log('i was clicked')}
-				target="_blank"
-				href={movie.imdb_link}
-			>
+			<a class="btn mb-2 h-min w-max bg-[#f4c519] font-bold" target="_blank" href={movie.imdb_link}>
 				<span><Icon icon="ic:baseline-local-movies" /></span>
 				<span>IMDB</span>
 			</a>

@@ -1,4 +1,5 @@
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
+import { logger } from '$lib/utils/logger.util';
 import { LocalStorageHelper, LocalStorageStores } from './localStorageHelper';
 
 export function removeMovie({
@@ -41,14 +42,16 @@ export function addMovie({
 }
 
 function setMoviesInLocalStorage(store: LocalStorageStores, items: TmdbSearchResult[]): void {
-	if (store === LocalStorageStores.Watchlist) {
-		LocalStorageHelper.setWatchlist(items);
+	switch (store) {
+		case LocalStorageStores.Watchlist:
+			LocalStorageHelper.setWatchlist(items);
+			break;
+		case LocalStorageStores.LikedMovies:
+			LocalStorageHelper.setLikedMovies(items);
+		default:
+			logger.warn(store, 'is not a valid localstorage store');
+			break;
 	}
-	if (store === LocalStorageStores.LikedMovies) {
-		LocalStorageHelper.setLikedMovies(items);
-	}
-
-	console.warn(store, 'is not a valid localstorage store');
 }
 
 export function isMovieInList(
