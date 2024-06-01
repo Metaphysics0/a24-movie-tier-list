@@ -84,7 +84,7 @@
 </script>
 
 <div
-	class="absolute right-0 top-0 z-50 flex flex-col rounded-bl-md rounded-tr-md bg-white bg-opacity-90 p-1"
+	class="absolute right-0 top-0 z-50 flex flex-col rounded-bl-md rounded-tr-md border-b border-l bg-white bg-opacity-90 p-1"
 >
 	{#each actions as action, idx}
 		<button

@@ -4,6 +4,8 @@ import type {
 	TmdbGenreMappingItem,
 	TmdbSearchResult
 } from '$lib/types/tmbd.types';
+import { logger } from '$lib/utils/logger.util';
+import { doStringsMatchIgnoreCase } from '$lib/utils/string.util';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
 import { getScore } from './utils';
 
@@ -40,7 +42,7 @@ export class TmdbApi {
 			return {
 				...movieResponse!,
 				external_movie_ids: externalMovieIds,
-				imdb_link: this.getImdbLinkfromId(externalMovieIds.imdb_id!)
+				imdb_link: externalMovieIds?.imdb_id ? this.getImdbLinkfromId(externalMovieIds.imdb_id) : ''
 			};
 		} catch (error) {
 			console.error(`Error getting search results for: ${movieTitle}`, error);
@@ -87,11 +89,16 @@ export class TmdbApi {
 	}
 
 	// like imdb id
-	async getExternalMovieIds(movieId: string | number): Promise<ExternalMovieIdsResponse> {
-		const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/external_ids`, {
-			headers: this.requestHeaders
-		});
-		return response.json();
+	async getExternalMovieIds(movieId: string | number): Promise<ExternalMovieIdsResponse | null> {
+		try {
+			const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/external_ids`, {
+				headers: this.requestHeaders
+			});
+			return response.json();
+		} catch (error) {
+			logger.warn(`Error getting external movie ids from movie: #${movieId}`);
+			return null;
+		}
 	}
 
 	private getImdbLinkfromId(id: string): string {
@@ -107,12 +114,15 @@ export class TmdbApi {
 		if (results.length === 1) return results[0];
 
 		const relevantResults = results.filter((movie) => {
-			const withMatchingTitle = movie.original_title === movieTitle;
+			const withMatchingTitle = doStringsMatchIgnoreCase(movie.original_title, movieTitle);
+
 			const withRelevantReleaseYear = releaseYear
 				? new Date(movie.release_date).getFullYear() === Number(releaseYear)
 				: new Date(movie.release_date).getFullYear() >= this.a24OldestMovieYear;
 			return withRelevantReleaseYear && withMatchingTitle;
 		});
+
+		if (relevantResults.length === 0) return results[0];
 
 		const sortedMovies = relevantResults.sort((movieA, movieB) => {
 			// Check if release years match
