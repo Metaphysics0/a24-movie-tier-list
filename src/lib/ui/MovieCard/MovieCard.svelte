@@ -21,12 +21,14 @@
 			modalStore.trigger(modalSettings);
 		}}
 	>
-		<img
-			src={movie.poster_path || movie.backdrop_path}
-			alt={`${movie.title} poster`}
-			class="max-w-64 rounded-md"
-			loading="lazy"
-		/>
+		<div class="max-w-64 rounded-md">
+			<img
+				src={movie.poster_path || movie.backdrop_path}
+				alt={`${movie.title} poster`}
+				class="max-w-64 rounded-md"
+				loading="lazy"
+			/>
+		</div>
 		<ActionIcons {movie} />
 	</button>
 

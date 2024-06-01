@@ -10,12 +10,11 @@ export function removeMovie({
 	movieToRemove: TmdbSearchResult;
 	localStorageStore: LocalStorageStores;
 }): TmdbSearchResult[] {
-	if (currentMovies.find((item) => item.id !== movieToRemove.id)) {
+	if (!currentMovies.find((item) => item.id === movieToRemove.id)) {
 		console.warn(`Movie: ${movieToRemove.title} is already removed!`);
 		return currentMovies;
 	}
 	const updatedMovieList = currentMovies.filter((item) => item.id !== movieToRemove.id);
-
 	setMoviesInLocalStorage(localStorageStore, updatedMovieList);
 
 	return updatedMovieList;
@@ -36,7 +35,6 @@ export function addMovie({
 	}
 
 	const updatedMovieList = [...currentMovies, movieToAdd];
-
 	setMoviesInLocalStorage(localStorageStore, updatedMovieList);
 
 	return updatedMovieList;

@@ -2,8 +2,9 @@ export interface ActionButton {
 	iconClass: string;
 	activeIconClass: string;
 	activeIconColorClass: string;
+	hoverIconColorClass: string;
 	isHovering: boolean;
 	isActive: boolean;
 	tooltipText: string;
-	onClick: (e: Event, idx: number) => void;
+	onClick: (actionIndex: number) => void;
 }
