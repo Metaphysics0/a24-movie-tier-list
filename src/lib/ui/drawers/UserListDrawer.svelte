@@ -4,8 +4,8 @@
 </script>
 
 <section class="p-3">
-	<div>
-		<strong>Liked Movies:</strong>
+	<div class="mb-3">
+		<strong class="text-lg">Liked Movies:</strong>
 		<ul>
 			{#each $likedMoviesStore as likedMovie}
 				<li>- {likedMovie.title}</li>
@@ -13,7 +13,7 @@
 		</ul>
 	</div>
 	<div>
-		<strong>Watchlist:</strong>
+		<strong class="text-lg">Watchlist:</strong>
 		<ul>
 			{#each $watchlistStore as watchlistMovie}
 				<li>- {watchlistMovie.title}</li>

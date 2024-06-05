@@ -6,8 +6,10 @@ import type {
 } from '$lib/types/tmbd.types';
 import { logger } from '$lib/utils/logger.util';
 import { doStringsMatchIgnoreCase } from '$lib/utils/string.util';
+import { sleep } from '../utils/sleep';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
-import { getScore } from './utils';
+import { getScore, isTooManyRequestsErrorResponse } from './utils';
+import _ from 'lodash';
 
 export class TmdbApi {
 	async searchMovies(movieTitles: string[]): Promise<TmdbSearchResult[]> {
@@ -94,9 +96,14 @@ export class TmdbApi {
 			const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/external_ids`, {
 				headers: this.requestHeaders
 			});
-			return response.json();
+			const data = await response.json();
+			if (isTooManyRequestsErrorResponse(data)) throw new Error(data);
+			return data;
 		} catch (error) {
-			logger.warn(`Error getting external movie ids from movie: #${movieId}`);
+			logger.warn(
+				`TmdbApi - getExternalMovieIds - Error getting external movie ids from movie: #${movieId}`,
+				error
+			);
 			return null;
 		}
 	}

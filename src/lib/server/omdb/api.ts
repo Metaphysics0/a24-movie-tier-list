@@ -1,5 +1,6 @@
 import { OMDB_API_KEY } from '$env/static/private';
 import { ONE_DAY_IN_SECONDS } from '$lib/constants/date.constants';
+import { getStoredImdbMovieIdFromTmdbMovieId } from '$lib/constants/missing-movie-data';
 import type { OmdbSearchResponse } from '$lib/types/omdb.types';
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 import { redis } from '../cache/redis';
@@ -41,9 +42,12 @@ export class OmdbApi {
 	async getOmdbDataFromTmdbMovie(
 		tmdbMovie: TmdbSearchResult
 	): Promise<GetOmdbDataFromTmdbMovieResponse> {
-		const imdbId = tmdbMovie.external_movie_ids?.imdb_id;
+		const imdbId =
+			tmdbMovie.external_movie_ids?.imdb_id || getStoredImdbMovieIdFromTmdbMovieId(tmdbMovie.id);
 		if (!imdbId) {
-			console.warn(`OmdbApi - tmdb movie: ${tmdbMovie.title} does not have an imdb id`);
+			console.warn(
+				`OmdbApi - tmdb movie: ${tmdbMovie.title} #(${tmdbMovie.id}) does not have an imdb id`
+			);
 			return {
 				tmdbId: tmdbMovie.id,
 				tmdbData: tmdbMovie,

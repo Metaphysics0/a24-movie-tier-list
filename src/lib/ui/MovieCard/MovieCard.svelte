@@ -9,8 +9,6 @@
 	export let movie: TmdbSearchResult;
 
 	const modalStore = getModalStore();
-
-	const modalSettings = getMovieInfoModalSettings(movie);
 </script>
 
 <div class="mx-auto mb-2 flex w-max max-w-64 flex-col items-center">
@@ -18,7 +16,7 @@
 		class="card relative rounded-md shadow-sm transition-all ease-in hover:cursor-pointer hover:opacity-90 hover:shadow-md active:shadow-sm"
 		on:click={(e) => {
 			e.preventDefault();
-			modalStore.trigger(modalSettings);
+			modalStore.trigger(getMovieInfoModalSettings(movie));
 		}}
 	>
 		<div class="max-w-64 rounded-md">

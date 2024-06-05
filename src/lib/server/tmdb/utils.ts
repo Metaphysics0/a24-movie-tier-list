@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 
 export function getScore(movie: TmdbSearchResult): number {
@@ -9,4 +10,14 @@ export function getScore(movie: TmdbSearchResult): number {
 		console.warn(`error getting score for ${movie.title}`, error);
 		return 0;
 	}
+}
+
+export function isTooManyRequestsErrorResponse(resp: any): boolean {
+	const errorResponse = {
+		status_code: 25,
+		status_message: 'Too many requests.',
+		success: false
+	};
+
+	return _.isEqual(errorResponse, resp);
 }
