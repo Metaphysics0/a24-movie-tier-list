@@ -26,6 +26,13 @@
 			{#if movie.omdbData?.Rated}
 				<span class="ml-1 font-movieRating"> {movie.omdbData?.Rated} </span>
 			{/if}
+			{#if movie.genres}
+				<span class="ml-1 text-sm"> {movie.genres.join(', ')} </span>
+			{/if}
+
+			{#if movie.omdbData?.Actors}
+				<p class="text-sm font-medium">{movie.omdbData.Actors}</p>
+			{/if}
 		</header>
 		<article>
 			<p class="text-xl font-semibold">Overview:</p>
@@ -34,26 +41,33 @@
 		{#if $modalStore[0].image}
 			<img
 				src={$modalStore[0].image}
-				class="modal-image h-auto w-full"
+				class="modal-image h-auto w-full rounded-md"
 				alt={$modalStore[0].title + ' image'}
 			/>
 		{/if}
-		<div class="flex flex-col">
-			<a class="btn mb-2 h-min w-max bg-[#f4c519] font-bold" target="_blank" href={movie.imdb_link}>
-				<span><Icon icon="ic:baseline-local-movies" /></span>
-				<span>IMDB</span>
-			</a>
-			<a
-				class="btn h-min w-max bg-[#535397] font-bold text-white"
-				target="_blank"
-				href={getWatchNowUrl()}
-			>
-				<span><Icon icon="ic:baseline-local-movies" /></span>
-				<span>Watch Now</span>
-			</a>
-		</div>
-		<footer class="modal-footer {parent.regionFooter}">
+		<section class="flex flex-col">
+			<strong class="mb-3 text-lg font-bold">Fun Links:</strong>
+			<div class="flex">
+				<a
+					class="btn mr-2 h-min w-max bg-[#f4c519] font-bold"
+					target="_blank"
+					href={movie.imdb_link}
+				>
+					<span><Icon icon="ic:baseline-local-movies" /></span>
+					<span>Imdb Page</span>
+				</a>
+				<a
+					class="btn h-min w-max bg-[#535397] font-bold text-white"
+					target="_blank"
+					href={getWatchNowUrl()}
+				>
+					<span><Icon icon="ic:baseline-local-movies" /></span>
+					<span>Watch Now</span>
+				</a>
+			</div>
+		</section>
+		<!-- <footer class="modal-footer {parent.regionFooter}">
 			<button class="btn {parent.buttonNeutral}" on:click={parent.onClose}>Close</button>
-		</footer>
+		</footer> -->
 	</div>
 {/if}

@@ -6,37 +6,28 @@ import type {
 } from '$lib/types/tmbd.types';
 import { logger } from '$lib/utils/logger.util';
 import { doStringsMatchIgnoreCase } from '$lib/utils/string.util';
-import { sleep } from '../utils/sleep';
 import { TmdbApiEndpointPaths } from './api-endpoints.enum';
+import { TMDB_GENRES } from './constants';
 import { getScore, isTooManyRequestsErrorResponse } from './utils';
-import _ from 'lodash';
 
 export class TmdbApi {
 	async searchMovies(movieTitles: string[]): Promise<TmdbSearchResult[]> {
 		try {
-			const tmdbGenres = await this.getGenres();
 			const movieResponses = await Promise.all(
 				movieTitles.map((movieTitle) => this.search(movieTitle!))
 			);
 
-			// remove undefined results
-			const filteredMovies = movieResponses.filter(Boolean) as TmdbSearchResult[];
+			const movies = movieResponses.filter(Boolean) as TmdbSearchResult[];
+			this.addGenresToMovies(movies);
 
-			// add genres to all movies
-			filteredMovies.forEach((movie) => {
-				movie.genres = movie.genre_ids.map(
-					(genreId) =>
-						tmdbGenres.find((tmdbGenres) => tmdbGenres.id === genreId)?.name?.toLocaleLowerCase()!
-				);
-			});
-			return filteredMovies;
+			return movies;
 		} catch (error) {
 			console.error('error searching movies', error);
 			return [];
 		}
 	}
 
-	async search(movieTitle: string): Promise<TmdbSearchResult | undefined> {
+	private async search(movieTitle: string): Promise<TmdbSearchResult | undefined> {
 		try {
 			const movieResponse = await this.searchMovie(movieTitle);
 			const externalMovieIds = await this.getExternalMovieIds(movieResponse!.id);
@@ -50,6 +41,15 @@ export class TmdbApi {
 			console.error(`Error getting search results for: ${movieTitle}`, error);
 			return;
 		}
+	}
+
+	private addGenresToMovies(movies: TmdbSearchResult[]): void {
+		movies.forEach((movie) => {
+			movie.genres = movie.genre_ids.map(
+				(genreId) =>
+					TMDB_GENRES.find((tmdbGenres) => tmdbGenres.id === genreId)?.name?.toLocaleLowerCase()!
+			);
+		});
 	}
 
 	private async searchMovie(movieTitle: string): Promise<TmdbSearchResult | undefined> {
@@ -77,7 +77,8 @@ export class TmdbApi {
 		return searchResult;
 	}
 
-	async getGenres(): Promise<TmdbGenreMappingItem[]> {
+	//  not used
+	private async getGenres(): Promise<TmdbGenreMappingItem[]> {
 		try {
 			const response = await fetch(TmdbApiEndpointPaths.GET_GENRES, {
 				headers: this.requestHeaders
@@ -91,7 +92,9 @@ export class TmdbApi {
 	}
 
 	// like imdb id
-	async getExternalMovieIds(movieId: string | number): Promise<ExternalMovieIdsResponse | null> {
+	private async getExternalMovieIds(
+		movieId: string | number
+	): Promise<ExternalMovieIdsResponse | null> {
 		try {
 			const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/external_ids`, {
 				headers: this.requestHeaders

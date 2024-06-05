@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
-export class S3Respository {
+export class S3Service {
 	private readonly client: S3Client;
 
 	constructor() {
