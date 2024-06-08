@@ -8,6 +8,10 @@
 	/* For multiple files use commas, ex: url(), url(), ... */
 	src: url('fonts/Quicksand-VariableFont_wght.ttf');
 }
+@font-face {
+	font-family: 'Libre-Bakersville';
+	src: url('fonts/LibreBaskerville-Bold.ttf');
+}
 
 :root [data-theme='wintry'] {
 	--theme-font-family-base: 'Quicksand', sans-serif;

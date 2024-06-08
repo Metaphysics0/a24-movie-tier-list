@@ -16,11 +16,6 @@ export function getSortedMovies(sortValue: string, movies: TmdbSearchResult[]): 
 				(a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
 			);
 
-		case SortOptions.DATE_RELEASED_OLD_TO_NEW:
-			return movies.sort(
-				(a, b) => new Date(a.release_date).getTime() - new Date(b.release_date).getTime()
-			);
-
 		default:
 			return movies;
 	}

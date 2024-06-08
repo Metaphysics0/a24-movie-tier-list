@@ -13,6 +13,9 @@ const config = {
 		join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')
 	],
 	theme: {
+		fontFamily: {
+			movieRating: ['Libre-Baskerville']
+		},
 		extend: {}
 	},
 	plugins: [

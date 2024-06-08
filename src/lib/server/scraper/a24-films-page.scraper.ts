@@ -1,5 +1,6 @@
 import { DOMParser } from 'xmldom';
-import { S3Respository } from '../repositories/s3.repository';
+import { S3Service } from '../s3/s3.service';
+import { S3Paths } from '../s3/s3.constants';
 
 export class A24FilmPageParser {
 	async getMovieTitles(): Promise<string[]> {
@@ -11,7 +12,7 @@ export class A24FilmPageParser {
 	}
 
 	private async fetchPageData() {
-		const pageResponse = await new S3Respository().get('assets/a24-films.html');
+		const pageResponse = await new S3Service().get(S3Paths.A24_FILMS_HTML);
 		if (!pageResponse?.Body) {
 			throw new Error('Error getting page data from S3');
 		}

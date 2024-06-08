@@ -11,6 +11,6 @@ export function normalizeMovieTitleForUrl(movieTitle: string): string {
 	return movieTitle.toLocaleLowerCase().split(' ').join('-');
 }
 
-// function titleCase(input: string) {
-//   return input
-// }
+export function doStringsMatchIgnoreCase(s1: string, s2: string) {
+	return s1.toLocaleLowerCase() === s2.toLocaleLowerCase();
+}

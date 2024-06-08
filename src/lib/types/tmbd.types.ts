@@ -19,7 +19,7 @@ export interface TmdbSearchResult {
 	score: number;
 	isUpcoming: boolean;
 	imdb_link?: string;
-	external_movie_ids?: ExternalMovieIdsResponse;
+	external_movie_ids?: ExternalMovieIdsResponse | null;
 	omdbData?: OmdbSearchResponse;
 }
 
