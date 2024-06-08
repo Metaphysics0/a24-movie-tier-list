@@ -1,17 +1,13 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import Icon from '@iconify/svelte';
 	import type { TmdbSearchResult } from '$lib/types/tmbd.types';
 	import { normalizeMovieTitleForUrl } from '$lib/utils/string.util';
 
-	export let parent: SvelteComponent;
-
 	const modalStore = getModalStore();
 
 	// @ts-ignore
 	const movie = $modalStore[0].component.props.movie as TmdbSearchResult;
-	console.log('MOVIEE', movie);
 
 	function getWatchNowUrl() {
 		const normalizedTitle = normalizeMovieTitleForUrl(movie.title);

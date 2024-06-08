@@ -21,7 +21,7 @@
 	>
 		<div class="max-w-64 rounded-md">
 			<img
-				src={movie.poster_path || movie.backdrop_path}
+				src={movie.poster_path || movie?.omdbData?.Poster || movie.backdrop_path}
 				alt={`${movie.title} poster`}
 				class="max-w-64 rounded-md"
 				loading="lazy"

@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { missingMovieData } from '$lib/constants/missing-movie-data';
 import type {
 	ExternalMovieIdsResponse,
 	TmdbGenreMappingItem,
@@ -105,7 +106,7 @@ export class TmdbApi {
 		} catch (error) {
 			logger.warn(
 				`TmdbApi - getExternalMovieIds - Error getting external movie ids from movie: #${movieId}`,
-				error
+				JSON.stringify(error)
 			);
 			return null;
 		}
@@ -133,6 +134,12 @@ export class TmdbApi {
 		});
 
 		if (relevantResults.length === 0) return results[0];
+
+		const resultsFromMissingMovieData = results.filter((result) =>
+			missingMovieData.map((i) => i.tmdbId).includes(String(result.id))
+		);
+
+		if (resultsFromMissingMovieData.length) return resultsFromMissingMovieData[0];
 
 		const sortedMovies = relevantResults.sort((movieA, movieB) => {
 			// Check if release years match
