@@ -16,6 +16,6 @@
 	}
 </script>
 
-<button class="w- m-3" on:click={toggleDrawer}>
+<button class="m-3" on:click={toggleDrawer}>
 	<Icon icon="charm:menu-hamburger" class="cursor-pointer text-3xl" />
 </button>

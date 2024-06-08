@@ -5,6 +5,7 @@
 	import Header from '$lib/ui/typography/Header.svelte';
 	import ToggleDrawerIcon from '$lib/ui/drawers/BurgerMenu.svelte';
 	import DrawerIndex from '$lib/ui/drawers/DrawerSlot.svelte';
+	import SocialLinks from '$lib/ui/general/SocialLinks.svelte';
 
 	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -18,7 +19,9 @@
 <Modal />
 
 <div class="flex">
-	<div />
+	<div class="p-3">
+		<SocialLinks />
+	</div>
 	<Header />
 	<ToggleDrawerIcon />
 </div>
